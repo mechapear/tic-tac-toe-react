@@ -1,18 +1,6 @@
 import './App.css'
-import { MouseEventHandler, useState } from 'react'
-
-type SquareProps = {
-  value: string | null // X, O, null
-  onSquareClick: MouseEventHandler<HTMLButtonElement>
-}
-
-function Square({ value, onSquareClick }: SquareProps) {
-  return (
-    <button className="square" onClick={onSquareClick}>
-      {value}
-    </button>
-  )
-}
+import { useState } from 'react'
+import Square from './Square.tsx'
 
 export default function Board() {
   // Lifting state up
