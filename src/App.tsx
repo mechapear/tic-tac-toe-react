@@ -1,5 +1,6 @@
 import './App.css'
 import { useState } from 'react'
+import Button from './Button.tsx'
 import Square from './Square.tsx'
 
 export default function Board() {
@@ -39,6 +40,11 @@ export default function Board() {
     status = 'Draw!'
   } else {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O')
+  }
+
+  function handleRestartClick() {
+    setSquares(Array(9).fill(null))
+    setXIsNext(true)
   }
 
   return (
@@ -88,6 +94,7 @@ export default function Board() {
           />
         </div>
       </div>
+      <Button onRestartClick={handleRestartClick} />
     </>
   )
 }
