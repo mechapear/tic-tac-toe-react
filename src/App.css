@@ -34,7 +34,7 @@
   text-align: center;
 }
 
-.restart-button{
+.restart-button, .jump-button{
   font-size: 16px;
   border-radius: 24px;
   border: 1px solid #000;
@@ -44,17 +44,21 @@
   cursor: pointer;
 }
 
-.restart-button:hover{
+.restart-button:hover, .jump-button:hover{
   border: 1px solid #999;
   background-color: #fff;
   color: #000;
 }
 
-.game {
-  display: flex;
-  flex-direction: row;
+.jump-button-item{
+  padding: 6px 0;
+}
+
+.jump-button-lists{
+  list-style-type: none;
+  padding-left: 0;
 }
 
 .game-info {
-  margin-left: 20px;
+  text-align: center;
 }
