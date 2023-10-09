@@ -15,18 +15,18 @@ export default function Board({
   onPlay,
   onRestart,
 }: BoardProps) {
-  function handleSquareClick(i: number) {
+  function handleSquareClick(index: number) {
     // Check if this square has already filled or this game has already over
-    if (squares[i] || calculateWinner(squares)) return
+    if (squares[index] || calculateWinner(squares)) return
 
     // Create a copy of the squares array
     // Avoiding direct data mutation and keep previous versions of the data intact, and reuse them later
     const nextSquares = squares.slice()
     // Update the nextSquares array
     if (xIsNext) {
-      nextSquares[i] = 'X'
+      nextSquares[index] = 'X'
     } else {
-      nextSquares[i] = 'O'
+      nextSquares[index] = 'O'
     }
 
     // pass the updated squares array to onPlay

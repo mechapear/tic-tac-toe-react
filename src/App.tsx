@@ -8,14 +8,17 @@ const INITIAL_HISTORY: Squares[] = [
 ]
 
 export default function Game() {
-  // set 'X' to be first move by default
-  const [xIsNext, setXIsNext] = useState(true)
   // Lifting state up
   // Array(9).fill(null) creates an array with nine elements
   // and sets each of them to null
   // Each entry in the array is X or O or null
   const [history, setHistory] = useState(INITIAL_HISTORY)
   const [currentMove, setCurrentMove] = useState(0)
+
+  // set 'X' to be first move by default
+  // xIsNext === true when currentMove is even
+  // xIsNext === false when currentMove is odd
+  let xIsNext = currentMove % 2 === 0
   // Render the squares
   const currentSquares = history[currentMove]
 
@@ -29,14 +32,12 @@ export default function Game() {
     setHistory(newHistory)
     // Update currentMove
     setCurrentMove(newHistory.length - 1)
-    // flip the value of xIsNext for determine the next player
-    setXIsNext(!xIsNext)
   }
 
   const handleRestartClick: BoardProps['onRestart'] = () => {
     setHistory(INITIAL_HISTORY)
-    setXIsNext(true)
     setCurrentMove(0)
+    xIsNext = true
   }
 
   // use map to transform history of moves into React elements representing buttons
@@ -60,7 +61,7 @@ export default function Game() {
   function jumpTo(nextMove: number) {
     setCurrentMove(nextMove)
     // set xIsNext to true if the number that you’re changing currentMove to is even.
-    setXIsNext(nextMove % 2 === 0)
+    xIsNext = nextMove % 2 === 0
   }
 
   return (
