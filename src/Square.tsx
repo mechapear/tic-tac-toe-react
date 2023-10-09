@@ -1,7 +1,10 @@
 import { MouseEventHandler } from 'react'
 
-type SquareProps = {
-  value: string | null // X, O, null
+export type SquareValue = 'X' | 'O' | null
+export type Squares = SquareValue[]
+
+export type SquareProps = {
+  value: SquareValue // X, O, null
   onSquareClick: MouseEventHandler<HTMLButtonElement>
 }
 
