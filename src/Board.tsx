@@ -17,7 +17,7 @@ export default function Board({
 }: BoardProps) {
   function handleSquareClick(index: number) {
     // Check if this square has already filled or this game has already over
-    if (squares[index] || calculateWinner(squares)) return
+    if (squares[index] || calculateWinner(squares, winSquares)) return
 
     // Create a copy of the squares array
     // Avoiding direct data mutation and keep previous versions of the data intact, and reuse them later
@@ -33,7 +33,9 @@ export default function Board({
     onPlay(nextSquares)
   }
 
-  const winner = calculateWinner(squares)
+  // Status
+  const winSquares = Array(9).fill('')
+  const winner = calculateWinner(squares, winSquares)
   let status
   if (winner) {
     status = winner + ' is the winner!'
@@ -51,42 +53,51 @@ export default function Board({
           <Square
             value={squares[0]}
             onSquareClick={() => handleSquareClick(0)}
+            winSquare={winSquares[0]}
           />
           <Square
             value={squares[1]}
             onSquareClick={() => handleSquareClick(1)}
+            winSquare={winSquares[1]}
           />
           <Square
             value={squares[2]}
             onSquareClick={() => handleSquareClick(2)}
+            winSquare={winSquares[2]}
           />
         </div>
         <div className="board-row">
           <Square
             value={squares[3]}
             onSquareClick={() => handleSquareClick(3)}
+            winSquare={winSquares[3]}
           />
           <Square
             value={squares[4]}
             onSquareClick={() => handleSquareClick(4)}
+            winSquare={winSquares[4]}
           />
           <Square
             value={squares[5]}
             onSquareClick={() => handleSquareClick(5)}
+            winSquare={winSquares[5]}
           />
         </div>
         <div className="board-row">
           <Square
             value={squares[6]}
             onSquareClick={() => handleSquareClick(6)}
+            winSquare={winSquares[6]}
           />
           <Square
             value={squares[7]}
             onSquareClick={() => handleSquareClick(7)}
+            winSquare={winSquares[7]}
           />
           <Square
             value={squares[8]}
             onSquareClick={() => handleSquareClick(8)}
+            winSquare={winSquares[8]}
           />
         </div>
       </div>
@@ -95,7 +106,7 @@ export default function Board({
   )
 }
 
-function calculateWinner(squares: Squares): SquareValue {
+function calculateWinner(squares: Squares, winSquares: string[]): SquareValue {
   // All posibility to win
   const lines = [
     [0, 1, 2], // horizontal
@@ -111,6 +122,13 @@ function calculateWinner(squares: Squares): SquareValue {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i]
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      for (let index = 0; index < winSquares.length; index++) {
+        if (index === a || index === b || index === c) {
+          winSquares[index] = 'win-square'
+        } else {
+          winSquares[index] = 'lose-square'
+        }
+      }
       return squares[a] // winner
     }
   }
