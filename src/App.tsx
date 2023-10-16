@@ -1,13 +1,14 @@
 import './App.css'
 import { useState } from 'react'
-import Board, { BoardProps } from './Board'
-import { Squares } from './Square.tsx'
+import Board, { BoardProps } from './components/Board.tsx'
+import { Squares } from './components/Square.tsx'
 
 const INITIAL_HISTORY: Squares[] = [
   Array.from({ length: 9 }).fill(null) as Squares,
 ]
 
-export default function Game() {
+// TODO: the main component and the filename should be the same
+export default function App() {
   // Lifting state up
   // Array(9).fill(null) creates an array with nine elements
   // and sets each of them to null
@@ -18,7 +19,7 @@ export default function Game() {
   // set 'X' to be first move by default
   // xIsNext === true when currentMove is even
   // xIsNext === false when currentMove is odd
-  let xIsNext = currentMove % 2 === 0
+  const xIsNext = currentMove % 2 === 0
   // Render the squares
   const currentSquares = history[currentMove]
 
@@ -37,31 +38,8 @@ export default function Game() {
   const handleRestartClick: BoardProps['onRestart'] = () => {
     setHistory(INITIAL_HISTORY)
     setCurrentMove(0)
-    xIsNext = true
-  }
-
-  // use map to transform history of moves into React elements representing buttons
-  // _ in front of variable name to indicate that we don't use it
-  const move = history.map((_squares, move: number) => {
-    let description
-    if (move > 0) {
-      description = 'Go to move #' + move
-      return (
-        // Useing move as a key
-        // Moves will never be re-ordered, deleted, or inserted, so it’s safe to use the move index as a key
-        <li key={move} className="jump-button-item">
-          <button className="jump-button" onClick={() => jumpTo(move)}>
-            {description}
-          </button>
-        </li>
-      )
-    }
-  })
-
-  function jumpTo(nextMove: number) {
-    setCurrentMove(nextMove)
-    // set xIsNext to true if the number that you’re changing currentMove to is even.
-    xIsNext = nextMove % 2 === 0
+    // xIsNext = true --> no need to update xIsNext because it will be updated when react re-render
+    // xIsNext will be recomputed to true becauuse currentMove will be 0
   }
 
   return (
@@ -73,7 +51,28 @@ export default function Game() {
         onRestart={handleRestartClick}
       />
       <div className="game-info">
-        <ol className="jump-button-lists">{move}</ol>
+        <ol className="jump-button-lists">
+          {/* use map to transform history of moves into React elements representing buttons
+              _ in front of variable name to indicate that we don't use it */}
+          {history.map((_squares, move: number) => {
+            // Hide the first move because it's equal to pressing restart.
+            if (move <= 0) return null
+
+            // Normal case
+            return (
+              // Useing move as a key
+              // Moves will never be re-ordered, deleted, or inserted, so it’s safe to use the move index as a key
+              <li key={move} className="jump-button-item">
+                <button
+                  className="jump-button"
+                  onClick={() => setCurrentMove(move)}
+                >
+                  Go to move #{move}
+                </button>
+              </li>
+            )
+          })}
+        </ol>
       </div>
     </div>
   )

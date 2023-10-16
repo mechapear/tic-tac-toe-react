@@ -1,4 +1,5 @@
 import { MouseEventHandler } from 'react'
+import { cloneArr } from '../utils/cloneArr.ts'
 import Button from './Button.tsx'
 import Square, { Squares, SquareValue } from './Square.tsx'
 
@@ -19,15 +20,12 @@ export default function Board({
     // Check if this square has already filled or this game has already over
     if (squares[index] || calculateWinner(squares, winSquares)) return
 
-    // Create a copy of the squares array
-    // Avoiding direct data mutation and keep previous versions of the data intact, and reuse them later
-    const nextSquares = squares.slice()
+    // Create a copy of the squares array to avoiding direct data mutation
+    // and keep the original reference intact so that we can reuse it later.
+    const nextSquares = cloneArr(squares)
+
     // Update the nextSquares array
-    if (xIsNext) {
-      nextSquares[index] = 'X'
-    } else {
-      nextSquares[index] = 'O'
-    }
+    nextSquares[index] = xIsNext ? 'X' : 'O'
 
     // pass the updated squares array to onPlay
     onPlay(nextSquares)
