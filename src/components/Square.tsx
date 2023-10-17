@@ -1,5 +1,5 @@
 import { MouseEventHandler } from 'react'
-import { BoardState } from './Board.tsx'
+import { BoardState } from '../domain/boardState.ts'
 
 export type SquareValue = 'X' | 'O' | undefined
 export type Squares = SquareValue[]
