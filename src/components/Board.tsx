@@ -3,6 +3,27 @@ import { cloneArr } from '../utils/cloneArr.ts'
 import Button from './Button.tsx'
 import Square, { Squares, SquareValue } from './Square.tsx'
 
+type GetStatusMessageParams = {
+  status: BoardStatus
+  winner?: SquareValue
+  nextPlayer?: string
+}
+
+function getStatusMessage({
+  status,
+  winner,
+  nextPlayer,
+}: GetStatusMessageParams) {
+  switch (status) {
+    case 'WIN':
+      return `${winner} is the winner!`
+    case 'DRAW':
+      return 'Draw!'
+    default:
+      return `Next player: ${nextPlayer}`
+  }
+}
+
 export type BoardProps = {
   xIsNext: boolean
   squares: Squares
@@ -16,119 +37,99 @@ export default function Board({
   onPlay,
   onRestart,
 }: BoardProps) {
+  // Status Message
+  const { status, winner, winSquares } = getBoardState(squares)
+
+  // calculate next player
+  const nextPlayer = xIsNext ? 'X' : 'O'
+
+  const statusMessage = getStatusMessage({
+    status,
+    winner,
+    nextPlayer,
+  })
+
   function handleSquareClick(index: number) {
     // Check if this square has already filled or this game has already over
-    if (squares[index] || calculateWinner(squares, winSquares)) return
+    if (squares[index] || status !== 'PLAYING') return
 
     // Create a copy of the squares array to avoiding direct data mutation
     // and keep the original reference intact so that we can reuse it later.
     const nextSquares = cloneArr(squares)
 
     // Update the nextSquares array
-    nextSquares[index] = xIsNext ? 'X' : 'O'
+    nextSquares[index] = nextPlayer
 
     // pass the updated squares array to onPlay
     onPlay(nextSquares)
   }
 
-  // Status
-  const winSquares = Array(9).fill('')
-  const winner = calculateWinner(squares, winSquares)
-  let status
-  if (winner) {
-    status = winner + ' is the winner!'
-  } else if (!squares.includes(null)) {
-    status = 'Draw!'
-  } else {
-    status = 'Next player: ' + (xIsNext ? 'X' : 'O')
-  }
-
   return (
     <>
-      <h1 className="status">{status}</h1>
+      <h1 className="status">{statusMessage}</h1>
       <div className="board-wrapper">
-        <div className="board-row">
-          <Square
-            value={squares[0]}
-            onSquareClick={() => handleSquareClick(0)}
-            winSquare={winSquares[0]}
-          />
-          <Square
-            value={squares[1]}
-            onSquareClick={() => handleSquareClick(1)}
-            winSquare={winSquares[1]}
-          />
-          <Square
-            value={squares[2]}
-            onSquareClick={() => handleSquareClick(2)}
-            winSquare={winSquares[2]}
-          />
-        </div>
-        <div className="board-row">
-          <Square
-            value={squares[3]}
-            onSquareClick={() => handleSquareClick(3)}
-            winSquare={winSquares[3]}
-          />
-          <Square
-            value={squares[4]}
-            onSquareClick={() => handleSquareClick(4)}
-            winSquare={winSquares[4]}
-          />
-          <Square
-            value={squares[5]}
-            onSquareClick={() => handleSquareClick(5)}
-            winSquare={winSquares[5]}
-          />
-        </div>
-        <div className="board-row">
-          <Square
-            value={squares[6]}
-            onSquareClick={() => handleSquareClick(6)}
-            winSquare={winSquares[6]}
-          />
-          <Square
-            value={squares[7]}
-            onSquareClick={() => handleSquareClick(7)}
-            winSquare={winSquares[7]}
-          />
-          <Square
-            value={squares[8]}
-            onSquareClick={() => handleSquareClick(8)}
-            winSquare={winSquares[8]}
-          />
-        </div>
+        {/*render 9 squares*/}
+        {squares.map((_square, index) => {
+          return (
+            <Square
+              // Squares will never be re-ordered, deleted, or inserted,
+              // so it’s safe to use the squares' index as a key
+              key={index}
+              value={squares[index]}
+              onSquareClick={() => handleSquareClick(index)}
+              squareStatus={status}
+              // check if this square is a win square
+              isWinSquare={winSquares?.includes(index)}
+            />
+          )
+        })}
       </div>
-      <Button onRestartClick={onRestart} />
+      <div>
+        <Button onRestartClick={onRestart} />
+      </div>
     </>
   )
 }
 
-function calculateWinner(squares: Squares, winSquares: string[]): SquareValue {
-  // All posibility to win
-  const lines = [
-    [0, 1, 2], // horizontal
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6], // vertical
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8], // diagonal
-    [2, 4, 6],
-  ]
+// TODO: extract to domain/boardState.ts
+// All posibility to win
+const WINNING_COMBINATIONS: number[][] = [
+  [0, 1, 2], // horizontal
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6], // vertical
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8], // diagonal
+  [2, 4, 6],
+]
 
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i]
+export type BoardStatus = 'PLAYING' | 'DRAW' | 'WIN'
+
+export type BoardState = {
+  winner: SquareValue
+  winSquares: (typeof WINNING_COMBINATIONS)[number] | undefined
+  status: BoardStatus
+}
+
+function getBoardState(squares: Squares): BoardState {
+  for (let i = 0; i < WINNING_COMBINATIONS.length; i++) {
+    const winCombination = WINNING_COMBINATIONS[i]
+    const [a, b, c] = winCombination
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      for (let index = 0; index < winSquares.length; index++) {
-        if (index === a || index === b || index === c) {
-          winSquares[index] = 'win-square'
-        } else {
-          winSquares[index] = 'lose-square'
-        }
+      return {
+        winner: squares[a], // winner
+        winSquares: winCombination,
+        status: 'WIN',
       }
-      return squares[a] // winner
     }
   }
-  return null
+
+  const isGameEnd = !squares.includes(undefined)
+
+  return {
+    winner: undefined, // winner
+    winSquares: undefined,
+    status: isGameEnd ? 'DRAW' : 'PLAYING',
+  }
 }

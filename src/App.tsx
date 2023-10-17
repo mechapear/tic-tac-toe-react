@@ -4,15 +4,14 @@ import Board, { BoardProps } from './components/Board.tsx'
 import { Squares } from './components/Square.tsx'
 
 const INITIAL_HISTORY: Squares[] = [
-  Array.from({ length: 9 }).fill(null) as Squares,
+  // Array(9).fill(undefined) creates an array with nine elements
+  // and sets each of them to undefined
+  // Each entry in the array is X or O or undefined
+  Array.from({ length: 9 }).fill(undefined) as Squares,
 ]
 
-// TODO: the main component and the filename should be the same
+// the main component and the filename should be the same
 export default function App() {
-  // Lifting state up
-  // Array(9).fill(null) creates an array with nine elements
-  // and sets each of them to null
-  // Each entry in the array is X or O or null
   const [history, setHistory] = useState(INITIAL_HISTORY)
   const [currentMove, setCurrentMove] = useState(0)
 

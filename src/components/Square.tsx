@@ -1,21 +1,31 @@
 import { MouseEventHandler } from 'react'
+import { BoardState } from './Board.tsx'
 
-export type SquareValue = 'X' | 'O' | null
+export type SquareValue = 'X' | 'O' | undefined
 export type Squares = SquareValue[]
 
 export type SquareProps = {
   value: SquareValue // X, O, null
   onSquareClick: MouseEventHandler<HTMLButtonElement>
-  winSquare: string
+  squareStatus: BoardState['status']
+  isWinSquare?: boolean
 }
 
 export default function Square({
   value,
   onSquareClick,
-  winSquare,
+  squareStatus,
+  isWinSquare,
 }: SquareProps) {
+  const gameEnd = squareStatus !== 'PLAYING'
+  const extraClassName =
+    squareStatus === 'WIN' && isWinSquare ? 'win-square' : 'lose-square'
+
   return (
-    <button className={`square ${winSquare}`} onClick={onSquareClick}>
+    <button
+      className={gameEnd ? 'square ' + extraClassName : 'square'}
+      onClick={onSquareClick}
+    >
       {value}
     </button>
   )
